@@ -1,0 +1,472 @@
+\documentclass{article}
+
+
+\usepackage{arxiv}
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{lipsum}
+\usepackage[pdftex]{graphicx}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{amssymb}
+\makeatletter
+\def\BState{\State\hskip-\ALG@thistlm}
+\makeatother
+
+
+\title{Does people's ability to make probability forecasts imply that they have statistical models?}
+\author{  
+ Adarsh Vijayaraghavan \\
+  Department of Information Technology\\
+  Rutgers Business School\\
+  Newark, NJ 08854 \\
+  \texttt{adarsh.vijayaraghavan@rutgers.edu} \\
+}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+Humans and other animals have some ability to forecast the future by incorporating information from the past and the present. This ability is essential for our survival in a chaotic, and possibly random, world. The psychology and neuroscience literature on forecasting attempts to answer two questions : is the mind optimal at prediction tasks; and is the mind Bayesian. In many cases, the answers to the two questions overlap. Researchers who believe that the mind is optimal often believe that the mind is Bayesian too (\cite{kording2014bayesian}, \cite{knill2004bayesian}, \cite{nassar2010approximately}, \cite{edwards2012bayesian}). 
+
+\cite{kahnemantversky1979} showed that the human mind is sub-optimal in many specific statistical tasks, leading to many studies on systematic cognitive biases. On the other hand, a slew of studies has shown that the mind is in fact surprisingly good at some prediction tasks (\cite{peterson1967man}, \cite{anderson1991human}, \cite{bogacz2007optimal}, \cite{griffiths2006optimal}). More that fifty years ago, \cite{peterson1967man} attempted to reconcile a similar discord in literature with a distinction between what they termed \textit{"descriptive"} and \textit{"inferential"} tasks. In a descriptive task, subjects are directly asked to estimate the parameter of a stochastic process. Consider an example an extension of which is central to this paper. Suppose there is an urn containing green and red rings. Subjects are shown one ring at a time sequentially from this urn, and their task is to estimate the proportion of green balls in the urn. This is a descriptive task. In an inferential task, rather than being asked to directly estimate the proportion of green balls, subjects are tasked with a different question, such as \textit{"there is an urn A with 70 \% green rings, and another urn B with 50 \% green rings. How likely is it that the sequence of rings were drawn from urn A?"}. Answering such a question would invole the calculation of \textit{inverse probabilities}, i.e., subjects would have to weigh two different hypothesis based on the sequence of rings as evidence. \cite{peterson1967man} observed that subjects are generally good at descriptive tasks, but not as good at inference tasks. Similar views have been advanced by some recent authors too (\cite{brown2009detecting}, \cite{gallistel2014perception}).
+
+Assuming that the mind is optimal, at least in certain circumstances, it is still not clear if the mind performs a Bayesian calculation to achieve this optimality. \cite{Bowers2012BayesianJS} used a Bayesian argument against such a proposition, which we discuss further in Section \ref{discussion}. They also use the terminologies introduced by \cite{marr1982vision}. Marr distinguished between \textit{computational models} and \textit{algorithmic models}. Computational models explore how a certain task can be completed without considering the possibility that the mind implements a similar model. An algorithmic model, on the other hand, considers a model from the perspective of how the mind can implements it neurobiologically. Such a model has to factor in how the mind stores the data required (the \textit{data structures} used) and the mechanism by which the mind performs these calculations. There is a potential source of confusion with the terminologies \textit{"algorithmic"} and \textit{"model"} here. I have already described the term \textit{"algorithmic"} above. The term \textit{"model"} here is used to indicate that we are trying to model the subject's behavior. From a statistician's point of view, a model could mean something different, and we make this distinction clearer a little later in this section and in section \ref{forecastingAndModelling}. Section \ref{forecastingAndModelling} also explains my use of the term \textit{"algorithms"}. To avoid this confusion, I will explicitly contextualize these two terms whenever I use them. \cite{Bowers2012BayesianJS} extend Marr's terminology to classify Bayesian researchers in psychology and neuroscience as \textit{algorithmic}, \textit{methodological}, and \textit{theoretical}. Their use of the term \textit{``algorithmic''} has a completely different meaning adding to the confusion with the terminologies. It suffices to remark that \cite{Bowers2012BayesianJS} claim that the algorithmic Bayesians are very rare, and I will not be referring to this usage anymore in this paper. The methodological Bayesians propose computational models of how a task is performed by the mind. However, they do not explicitly claim that that the mind faithfully implements an identical model. Methodological Bayesians suggest that the mind may be using certain heuristics and approximations to perform calculations that are similar to their computational models. Theoretical Bayesians, on the other hand, claim that their models are algorithmic. \cite{Bowers2012BayesianJS} contend that such claims must also demonstrate how the mind stores priors, calculates likelihoods, multiplies both, and when required, normalizes the product with the normalizing factor. However, there is little evidence that the mind can perform all these steps. Besides \cite{Bowers2012BayesianJS}, other researchers have questioned the claims that the mind is optimal (\cite{pittphilsci14767}, \cite{Tauber2017BayesianMO}, \cite{elqayam2011subtracting}).
+
+In this paper, we would like to ask a third question about the mind's forecasting ability - does people's ability to make forecasts imply that they have \textit{statistical models}? The term \textit{model} as used in the statistics literature represents a stochastic data-generating process. A statistical model encapsulates the assumptions we make about data. In \cite{breiman2001statistical}'s terminology, these models are "\textit{data models}". For instance, an assumption usually made in various models is that each observation is independent of the other observations. Another assumption could be that the errors in measurement of each observation follow a Gaussian distribution. However, there are also methods from the forecasting literature that do not make use of statistical models. These methods predict the next outcome in a sequence by minimizing some learning function. In \cite{breiman2001statistical}'s terminology, these are "\textit{algorithmic models}". Note that this is different from the algorithmic model of the mind described in the previous paragraph.
+
+We are going to focus on the data generated from one experiment in the psychology literature. The study we focus on is by \cite{gallistel2014perception}, which is very similar to the descriptive experiment we saw earlier, except for the fact that the proportion of green rings in the urn can potentially vary from trial-to-trial. This is a non-stationary Bernoulli process - a Bernoulli process because if the probability of seeing a green ring in any given trial is \textit{p}, the probability of seeing a red ring is \textit{(1-p)}; and non-stationary because \textit{p} is not fixed. In this study titled \textit{``The perception of probability''}, \cite{gallistel2014perception} propose a semi-Bayesian changepoint model to estimate the trial-by-trial probability of our non-stationary Bernoulli process. We refer to their model as the GKLML model based on the initials of the authors. In this experiment, subjects are sequentially shown 1000 rings with replacement from an urn filled with red and green balls, and tasked with estimating the proportion of green rings in the urn before each trial. The subjects are informed that this proportion of green rings is not constant. The subjects can indicate their current estimate of the proportion of the green balls in the urn by moving a slider between 0 to 1 (inclusive on both sides). Note that this proportion of green rings in the urn can be interpretted as the hidden true probability of observing a green ring in the next trial. \cite{gallistel2014perception} show that the subjects' behavior closely resembles the behavior exhibited by the GKLML model. One of the prominent characteristic using which they demonstrate this resemblance is the distribution of \textit{"step heights"} and \textit{"step widths"}. Step height is the magnitude by which the estimated probability changes from one trial to another. Step width is the number of trials for which the estimated probability is kept constant before determining that there needs to be a change in the estimate.
+
+My contribution in this paper is as follows. I have replicated the GKLML model programmatically to ensure that I have a thorough understanding of it. Further, I attempt to analyze other non-Bayesian methods that lead to predictions with the same characteristics as the subjects' predictions. Apart from possessing the advantages of being conceptually and computationally simple, these methods do not make use of any statistical models. I then argue that the fact that the mind makes optimal predictions in some very specific tasks do not necessarily imply that the mind makes use of Bayesian methods, or that the mind has statistical models to draw upon.
+
+The rest of this article is structured as follows. In section (\ref{forecastingAndModelling}), I will briefly contrast making predictions through statistical models with algorithmic models. The loss function for these algorithmic models is a proper scoring rule, and I provide a brief description of proper scoring rules in the same section. In section (\ref{perceptionsOfProbability}), I describe the experiment performed in \cite{gallistel2014perception}. I then describe their examination of simple trial-by-trial non-Bayesian methods which do not fit the step heights and step widths generated by the actual subjects in the experiment. Finally, I provide a brief description of the GKLML model.
+
+In section \ref{altNonBayesian}, I suggest some methods that explain this data without making use of statistical models. In section \ref{results}, I compare the GKLML model with our methods in terms of the step heights and step widths. I also compare these methods in terms of the proper scoring rules I introduce in section (\ref{forecastingAndModelling}). The proper scoring rules help measure the precision of our estimates. I will conclude with a discussion in section (\ref{discussion}).
+
+\section{Probability forecasting and statistical modeling}
+\label{forecastingAndModelling}
+In this section, I am going to contrast two different ways of making predictions. The two different ways I discuss are somewhat in the lines of what \cite{breiman2001statistical} called the two different cultures - the \textit{Data Modeling} culture and the \textit{Algorithmic Modeling} culture. To avoid confusion with some of the terminologies from the psychology and neuroscience literature, I refer to these two cultures as \textit{predictions using statistical models} and \textit{predictions without statistical models}. I use the term \textit{algorithm} in its broader sense representing a step-by-step computational procedure.
+
+A statistical model encapsulates our assumptions about the data generating process. In the case of our example with rings drawn from an urn, one assumption that could be made is that the rings are drawn from a binomial distribution with a parameter \textit{p}. A Bayesian statistical model may include assumptions about the \textit{a priori} probability distribution that is in a mathematically convenient form. On the other hand, methods of prediction without statistical models do not make any assumption about the underlying data generating process. As \cite{cesa2006prediction} note in their book, such an approach can be applied for causal mechanisms that are deterministic, stochastic, or even adversarial.  A few such methods are described below.
+
+\subsection{Exponential smoothing method}
+\label{expSmoothening}
+Exponential smoothing methods are very common in the forecasting literature, and an early explanation of the method was provided by \cite{holt1957forecasting}. This method is conceptually very simple, easy to implement, and tail-recursive. The exponential smoothing method takes a weighted average of all previous observations to predict the outcome of the next trial. The weights, however, are unequal. The more recent observations have more weight, while the less recent ones have exponentially lower weights. This paper deals only with Bernoulli trials with 2 outcomes, so we can consider a simplified formulation : 
+\[ \hat{y_t} = \lambda * x\textsubscript{t-1} + (1 - \lambda) \hat{y\textsubscript{t-1}} \]
+Where $\hat{y_t}$ is the Bernoulli parameter of the next trial which we are attempting to predict. $x\textsubscript{t-1}$ $\in$ \{0, 1\} and depends on the latest observation. $\lambda$ is the memory parameter that controls how rapidly the weight of older observations decreases. In a situation of high volatility where the underlying true probability we are trying to estimate changes rapidly, $\lambda$ needs to be low. If the volatility is low, $\lambda$ needs to be higher. The formula is recursive, and makes use of all past observations. We usually start by setting $\hat{y_1}$ with an arbitrary value, usually 1/2, and then use the formula recursively for subsequent predictions after observing each trial.
+
+\subsection{Prediction with expert advice}
+\label{predWithExpert}
+Prediction with expert advice is a another common method in the forecasting literature. Prediction with expert advice can incorporate statistical models too, but this is not relevant to the approaches considered in this paper. The idea behind prediction with expert advice is as follows. If there are \textit{K} experts making predictions after each stage, we can combine the information provided by each expert along with any other information we might possess to do almost as well as the best expert when seen in retrospect. The goodness of an expert is measured using a pre-selected \textit{proper scoring rule}. Before taking a look at such approaches in detail, I would briefly describe proper scoring rules. \cite{gneiting2007strictly} provide a more detailed account. 
+
+Probabilistic forecasts are given in the form of probability distributions. \textit{Scoring rules} are functions that evaluate to a numerical measure based on the predictive probability distribution and the actual outcome. A scoring rule can be used to evaluate the forecasting ability of a forecaster and comparatively rate different forecasters. The scoring rule is in this sense, a reward function. For example, if $\gamma$ is the forecaster's predictive probability distribution, and $\omega$ is the actual event that materializes, 
+\[ \lambda(\omega, \gamma)\]
+is a scoring rule. A \textit{proper scoring rule} is one that incentivizes the forecaster to give their true beliefs as the predictive probability distribution. When a proper scoring rule is used, the reward for a forecaster is maximized when they give the truth as their predictive probability distribution. A \textit{strictly proper scoring rule} ensures that the forecaster's reward is uniquely maximized when they give the truth as the predictive probability distribution. \cite{gneiting2014probabilistic} describe the necessity for \textit{calibrated} and \textit{sharp} forecasts. A well-calibrated forecast is such that the predictive probability distribution and the observations are statistically indistinguishable. They behave as if they are from the same stochastic distribution. A sharp forecast is well-concentrated, rather than dispersed, in the predictive space. 
+
+\cite{brier1950verification} provided one of the earliest known formulations of a scoring rule, a generalized version of which is known as the \textit{Brier score}. We will be discussing the generalized version of Brier's formulation below. While Brier score is a \textit{quadratic score}, other proper scoring rules include \textit{logarithmic score} and \textit{spherical score}. These are described in \cite{gneiting2007strictly}. For a generalized version of Brier score, we refer to \cite{vovk2009prediction}. Continuing with the notations $\omega$, $\lambda$ and $\gamma$ introduced earlier, let the observation space be $\Omega$ and the decision space be $\Gamma$. We restrict $\Omega$ to the finite set. The Brier score is defined as \
+\[ \lambda (\omega, \gamma) = \sum\nolimits_{o \in \Omega} (\gamma \{ o\} - \delta_\omega\{o\})^2\]
+Here, $\delta_\omega$ $\in$ $P(\Omega)$ is the probability measure concentrated on $\omega$. \cite{vovk2009prediction} provide an example where, if the observation space $\Omega$ is \{1, 2, 3\}, and the predictive probability distribution $\gamma$ assigns probabilities of 1/2, 1/4 and 1/4 to events 1, 2 and 3 respectively, we can calculate
+\[ \lambda (\omega, \gamma) = (1/2 - 1)^2 + (1/4 - 0)^2 + (1/4 - 0)^2 = 3/8\].
+
+\cite{vovk2009prediction} define a protocol ((\ref{expert})) for predictions obtained by the combination of expert opinions. As is common in forecasting literature, the idea of prediction is seen as a game between reality and the forecaster.
+
+\begin{algorithm}
+\floatname{algorithm}{Protocol}
+\caption{Prediction with expert advice}\label{expert}
+\begin{algorithmic}
+\State $L_0 \leftarrow 0$
+\State $L\textsuperscript{k}\textsubscript{0} \leftarrow 0$, for k = 1, 2, 3,.. K
+\For{N = 1, 2, ...}
+	\State Expert k announces $\gamma\textsubscript{N}\textsuperscript{k} \in \Gamma$, k = 1, 2,.. K.
+	\State Forecaster announces $\gamma\textsubscript{N} \in \Gamma$.
+	\State Reality announces $\omega_N \in \Omega$.
+	\State $L\textsubscript{N} \leftarrow L\textsubscript{N - 1} +  \lambda (\omega_N, \gamma_N$).
+	\State $L\textsuperscript{k}\textsubscript{N} \leftarrow L\textsuperscript{k}\textsubscript{N-1} +  \lambda (\omega_N, \gamma$\textsubscript{N}\textsuperscript{k}). k = 1, 2, .. K.
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+The protocol is fairly simple. We initiate the total loss function of the forecaster and the individual loss functions of each expert with 0. We then observe each trial one-by-one. For every trial, each expert announces their predictive probability distribution. The forecaster combines the predictions made by all experts in some unspecified way and makes their own prediction. Finally, reality announces the truth. The total loss function of the forecaster and each individual expert is then augmented with the score from the current trial.
+
+For such a protocol, \cite{vovk2009prediction} provide the \textit{strong aggregating algorithm} ((\ref{strong})) as an optimal strategy.
+
+\begin{algorithm}
+\caption{Strong aggregating algorithm}\label{strong}
+\begin{algorithmic}
+\State $w\textsuperscript{k}\textsubscript{0} \leftarrow 1$, for k = 1, 2, 3,.. K
+\For{N = 1, 2, ..}
+	\State Read the expert predictions $\gamma$\textsubscript{N}\textsuperscript{k}, k = 1, 2,.. K.
+	\State Set $G_N(\omega) \leftarrow -ln \sum\limits_{k=1}^K w\textsubscript{N-1}\textsuperscript{k} e^{-\lambda(\omega, \gamma\textsuperscript{k}\textsubscript{N})}, \omega \in \Omega $.
+	\State Solve $\sum\nolimits_{\omega \in \Omega} (s - G_N(\omega))^+ = 2\:such\:that\:s \in \mathbb{R}$.
+	\State Set $\gamma_N\{\omega\} \leftarrow (s - G_N(\omega))^+/2,\: \omega \in \Omega$.
+	\State Output prediction $\gamma_N \in P(\Omega)$.
+	\State Read observation $\omega_N$.
+	\State $w \textsuperscript{k}\textsubscript{N} \leftarrow  w\textsuperscript{k}\textsubscript{N-1} + \lambda(\omega_N, \gamma \textsubscript{N}	   \textsuperscript{k})$. k = 1, 2,.. K.
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+The algorithm starts by assigning a weight of 1 to each of the K experts. For every observation, the prediction given by each expert is averaged based on their weights and then normalized to a value between 0 and 1 (to arrive at a probability). After seeing the truth, the weights of each expert are reconsidered based on their score for that particular trial and their previous weight. The scoring rule used here is the Brier score. \cite{vovk2009prediction} prove that this is asymptotically the optimal and the best possible strategy. Their theorem is stated below :
+\begin{quote}
+Using Algorithm 1 (the strong aggregating algorithm) as Learner's strategy in Protocol 1 for the Brier game guarantees that
+\[ L_N \leq \min_{k = 1, 2, \dots K} L\textsubscript{N}\textsuperscript{k} + \ln K\]
+for all N = 1, 2, $\dots$ If A < $\ln$ K, Learner does not have a strategy guaranteeing 
+\[ L_N \leq \min_{k = 1, 2, \dots K} L\textsubscript{N}\textsuperscript{k} + A \]
+\end{quote}
+
+Here, the term \textit{Learner} refers to the forecaster.
+
+\section{The Gallistel arguement for human statistical models}
+\label{perceptionsOfProbability}
+\begin{figure}
+	\includegraphics[width=\linewidth]{images/GallistelsExperiment.PNG}
+	\caption{The experimental setup used by Gallistel et. al. (Fig. 3 from ``The perception of probability'')}
+	\label{fig:GallistelsStudy}
+\end{figure} 
+\subsection{Description of the experiment}
+The experimental set-up used by \cite{gallistel2014perception} is shown in figure \ref{fig:GallistelsStudy} . 10 subjects were involved in this experiment, and each subject participated in 10 sessions. In every session, the subjects were shown 1000 rings from an imaginary urn. Each ring was either red or green. The subjects were shown one ring at a time, and were instructed to use the slider at the bottom-left to indicate their estimate of the proportion of the green balls in the urn. The box on the top-right is a visualization of the slider setting selected by the user. On the bottom-right, there is a button for the subject to request the next ring. The subject can also use the \textit{"I think the box has changed"} button to indicate that they feel there is an underlying change in the true proportion of green and red balls in the urn. The \textit{"I take that back"} button can be used to indicate that the subject changed their mind about there being a change in the true probability. \ref{fig:GallistelsStudy} note that this button was unavailable for the first 5 subjects. For the remaining subjects, this button indicates a \textit{"second thought"} about their previous slider movement.
+
+The probability that the true proportion of green rings in the urn would change in any given trial was fixed at 0.005, and a geometric distribution was used to decide if the true proportion would change in a given trial. Hence the expectation of step width was 200. The magnitude of such a change was approximately uniformly distributed between the two intervals -0.85 to -0.2 and 0.2 to 0.85. 
+
+\subsection{Human subjects' distribution of step heights and widths not matched by simple trial-by-trial updating models}
+
+
+\begin{figure}
+	\includegraphics[width=\linewidth]{images/SubjectSlider.PNG}
+	\caption{The trial-by-trial slider setting of the subject (solid line) vs the hidden true probability (dotted line). The subject display a step-holding pattern. Fig. 5 from ``The perception of probability''. }
+	\label{fig:subjectSlider}
+\end{figure}
+
+\begin{figure}
+	\includegraphics[width=0.7\columnwidth]{images/SubjectJointDistri.PNG}
+	\caption{The joint distribution of step heights and step widths of subjects' slider moments for a single session. The step-widths are in the x-axis and the step heights are in y-axis with linear scale. The marginal distribution of step heights and step widths are shown in the overlaid diagrams along the y-axis and x-axis respectively. (See Fig. 11 from ``The perception of probability'' for a similar figure across all subjects and sessions)}
+	\label{fig:SubjectJointDistribution}
+\end{figure} 
+
+\cite{gallistel2014perception} attempt to model the subjects' behavior with a few variations of trial-by-trial updating methods proposed by Behrens et al. (\cite{behrens2007LearningRate}). This method is identical to the \textit{exponential smoothing} method we discussed in section \ref{expSmoothening}. The exponential smoothing method is essentially a running average method, and it re-estimates the predicted value after every trial. The re-estimated prediction is very unlikely to be the same as the previous prediction. An interpretation of making such predictions which change in every trial is that there is a underlying change in the hidden proportion of green rings in the urn at every trial. This, as we know, is not true. The subjects do not re-estimate the proportion of green balls at each turn, and the subjects' estimate across all trials follows a step function (fig. \ref{fig:subjectSlider}). Subjects in earlier experiment conducted by \cite{robinson1964continuous} also exhibited a similar step pattern.
+
+To model this step-behavior, \cite{gallistel2014perception} start by introducing a threshold \textit{T}. In their first model, it is assumed that subjects do not move the slider unless the difference between their previously estimated probability and the actual observed probability is larger than the parameter \textit{T}. However, this model too does not match the actual subjects' slider movements. Fig. \ref{fig:SubjectJointDistribution} shows the joint distribution of step heights and step widths of subjects' slider movements. The marginal distributions are shown along each of the axis. As can be seen from the marginal distribution of step heights, subjects are more prone to making slider movements that are smaller in magnitude. Introducing a threshold will suppress these smaller slider movements and result in a distribution that is bi-modal.
+
+\cite{gallistel2014perception} then attempt two other models. The first is similar to the model we just described. However, instead of using a fixed threshold, they use a Gaussian distribution to randomly generate a threshold value. The second, referred to as the \textit{"two kernel model"}, is a little more complicated and combines ideas from both the previous models. We will start by briefly explaining the term volatility to understand this model. Volatility is roughly how frequently the hidden true proportion of green rings in the urn changes. In a single session of experiment consisting of 1000 trials, there may be small sub-sequences where the volatility is high, and other sub-sequences where volatility is relatively low. This is because, as described in the previous section, the probability that the true proportion of rings in the urn would change is not uniformly distributed (it is a geometric distribution). This model generates two different probability estimates using two different memory parameters - one with a longer memory indicating low volatility, and another with a shorter memory indicating high volatility. The absolute difference between these two estimates are compared to yet another threshold to decide the current running average probability. Finally, this running average probability is again compared with the threshold T to decide if the slider should be moved. Despite the seeming complexity, it is obvious that this model will not work as it still suppress the smaller slider movements.
+
+\cite{gallistel2014perception} conclude that both these models do not fit the behavior of subjects. In section \ref{altNonBayesian}, we will propose a model that extends on the exponential smoothing method and still fits the distribution of subjects' slider movements reasonably.
+
+\subsection{The GKLML model}
+Having attempted simpler models that do not incorporate Bayesian priors, \cite{gallistel2014perception} then propose a semi-Bayesian model to explain the behavior of the subjects. The flowchart in fig. \ref{fig:flowchart} gives an overview of this model. We will refer to this two-step changepoint algorithm as the GKLML model.  Our detailed implementation of this algorithm is described in Appendix B. Appendix A gives some of the notations we use as a part of this algorithm. We will briefly describe the algorithm here for the sake of continuity.
+
+The core idea behind this algorithm is to reduce the amount of information that needs to be stored at any point of time. Instead of storing the complete sequence of observations in a given trial, we store just two sub-sequences of variable lengths. These sub-sequences are determined by our estimate of points at which we believe there was a change in the underlying true proportion of green rings in the urn. We call these points \textit{changepoints}. Changepoints are essentially trial numbers identifying the trials at which we presume the changes occurred. After every trial, the current estimate of the probability of seeing a green ball is compared with the relative number of green balls seen since the latest changepoint. Until the product of this deviation and the number of observations since the latest changepoint is significant, no action is taken. If there is a significant deviation, a Bayesian model comparison is used to determine if there was an additional change in the true probability of seeing a green ring. If no changepoint is detected, the latest changepoint is temperorily removed, and a second round of Bayesian model comparison is performed. Based on this comparison, the latest changepoint is either dropped or relocated. Throughout the calculation, prior probability distributions for the true probability of seeing a green ring, as well as the volatility in this true probability is maintained and reevaluated.
+
+\begin{figure}
+	\includegraphics[width=\linewidth]{images/ChangePointAlgoFlowchart.PNG}
+	\caption{The flowchart for the two-step changepoint algorithm (Fig. 13 from ``The perception of probability'')}
+	\label{fig:flowchart}
+\end{figure}
+
+\section{Alternative simple models that minimize a proper scoring rule}
+\label{altNonBayesian}
+
+\subsection{Degraded Brier smoothing algorithm}
+We use Algorithm (\ref{strong}) as a part of what I call the \textit{degraded Brier smoothing algorithm} (algorithm (\ref{degraded})). The degraded Brier smoothing algorithm uses the simple exponential smoothing method described in section \ref{expSmoothening}. Different experts have a different memory parameter, and their forecasts are combined using the strong aggregating algorithm described in section \ref{predWithExpert}. The final prediction is continuous, and can potentially be different for each trial. To model the behavior of the human subjects, we then degrade this algorithm by introducing an element of randomness to decide if we will move the slider. 
+
+Since we are trying to model a human subject's behavior, we visualize an imaginary slider that keeps track of our current estimate of the number of green balls in the urn. This allows us to continue having the notion of step heights and step widths.
+
+\begin{algorithm}
+\caption{Degraded Brier smoothing algorithm}\label{degraded}
+\begin{algorithmic}
+\State Set width $\leftarrow$ 0
+\For{N = 1, 2, ..}
+	\State Read the expert predictions $\hat{P\textsubscript{N}\textsuperscript{k}}$, k = 1, 2,.. K.
+	\State Combine the predictions of K experts using the strong aggregating algorithm into $\hat{P\textsubscript{N}}$.
+	\State Generate a random number from an uniform distribution of 0 to 1.
+	\If {the random number falls within region Q}
+		\State Move the slider to $\hat{P\textsubscript{N}}$.
+		\State Set width $\leftarrow$ 0.
+		\State Skip the current iteration and continue with the next iteration.
+	\EndIf
+	\State Calculate height = $\hat{P\textsubscript{N}} - \hat{P\textsubscript{N - 1}}$.
+	\State Set Deviation $\leftarrow \sqrt{(width/A) ^ 2 + (height/B) ^ 2}$.
+	\If {Deviation > C}
+		\State Move the slider to $\hat{P\textsubscript{N}}$.
+		\State Set width $\leftarrow$ 0.
+		\State Skip the current iteration and continue with the next iteration.
+	\EndIf
+	\State Keep the slider at $\hat{P\textsubscript{N - 1}}$.
+	\State Set width $\leftarrow$ width + 1.
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+In algorithm \ref{degraded}, Q is a sub-interval within 0 to 1 where the slider is randomly moved regardless of the slider height or width. One possible value is the interval (0.70, 0.74) excluding both the bounds. Here, the region itself is not significant as much as the size of the region, since we are using an uniform distribution to generate the random numbers. A, B and C are free-parameters that depends on the subject we are trying to model. One possible combination is A = 250, B = 100 and C = 0.7.
+
+\section{Results}
+
+\begin{figure}
+	\includegraphics[width=\linewidth]{images/BrierVsSubject.PNG}
+	\caption{Slider setting as a function of the trial number. The orange line indicates the subject's slider movements, whereas the blue line indicates the slider movements by the degraded Brier smoothening algorithm. The degraded Brier smoothening algorithm closely resembles the subject's own behaviour.}
+	\label{fig:BrierVsSubject}
+\end{figure}
+
+\begin{figure}
+	\includegraphics[width=\linewidth]{images/BrierJD.PNG}
+	\caption{The joint distribution of the step heights and step widths of the slider movements generated by the degraded Brier smoothing algorithm for a single subject in one trial. The uni-modal nature of the step heights shown is very similar to the subject's behavior from  \ref{fig:SubjectJointDistribution}  above. The step widths are a reasonable imitation of the subject's behavior, but there is an asymptotic decrease of the number of slider movements with the step height, unlike the subject's behavior. However, this behavior is similar to what was achieved by the GKLML model. }
+	\label{fig:brierJd}
+\end{figure}
+
+We used 3 experts for the degraded Brier smoothing algorithm with memory parameters of 1/7, 1/10 and 1/13 respectively. The trial-by-trial slider setting of the degraded Brier smoothing algorithm for a single subject in a single trial is shown in fig. \ref{fig:BrierVsSubject} (blue line). The subject's own slider movements (orange line) for the same trial is also superimposed in the figure. The degraded Brier smoothing model is able to model the subject's behavior reasonably well. The four free-parameters of the degraded Brier smoothing algorithm control the number of slider movements made. The joint-distribution of step heights and step widths of the slider movements generated by the degraded Brier smoothing algorithm is shown in fig. \ref{fig:brierJd}. Comparing this with fig. \ref{fig:SubjectJointDistribution}, we see a fair resemblance. The behavior of step heights is very similar to that of the subjects' own behavior. The behavior of step widths is reasonably similar. However, the subjects do not display the asymptotic decrease in number of slider movements with increasing step widths that is seen in fig. \ref{fig:brierJd}. The behavior of the degraded Brier score smoothing algorithm in this regards is similar to that displayed by the GKLML model shown in fig. 15 of \cite{gallistel2014perception}.
+
+Table  \ref{table:1} compares the Brier scores for each of the methodology for a single trial of a single subject. The truth has a Brier score of 0.1392, which is the best we can hope to achieve. The Brier smoothing algorithm without the degradation does well, but this method has a varying probability estimate in each trial and does not model the subject's behavior. The GKLML method does very well considering that it is able to model the subject's behavior too. The degraded Brier smoothing algorithm matches the subject's behavior, but it's Brier score needs to be improved upon. Surprisingly, the subject does better than the degraded Brier smoothing algorithm.
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{ |p{10cm}|p{3cm}|  }
+ \hline
+ \textbf{Methodology} & \textbf{Brier Score}\\
+ \hline
+ Truth   & 0.1392   \\
+\hline
+ Brier smoothing algorithm without degradation &   0.1517 \\
+\hline
+ GKLML model &  0.1560\\
+\hline
+Subject &  0.1587\\
+\hline
+ Degraded Brier smoothing algorithm  & 0.1794\\
+ \hline
+\end{tabular}
+\caption{A comparison of Brier scores for various methodologies.}
+\label{table:1}
+\end{table}
+
+
+\label{results}
+
+\section{Discussion}
+\label{discussion}
+
+\cite{robinson1964continuous} and \cite{gallistel2014perception} have shown us that the human mind is surprisingly optimal in specific task of estimating the parameter of a non-stationary Bernoulli process. But does \cite{gallistel2014perception}'s computational Bayesian model imply an identical algorithmic model? 
+
+\cite{Bowers2012BayesianJS} used Bayes theorem to make a case against studies that conclude that humans are optimal Bayesian estimators. They formulated Bayes theorem as follows :
+\[ P(H\textsubscript{Optimal} \vert E) = \frac{P(H\textsubscript{Optimal}) * P(E \vert H\textsubscript{Optimal})}{P(E)} \]
+Here, H\textsubscript{Optimal} is the hypothesis that that human mind is an optimal Bayesian estimator. E is the evidence we have in the form of data. The left hand term is the posterior distribution that the mind is an optimal Bayesian estimator given the evidence. The numerator on the right hand term is a product of the prior probability that the human mind is an optimal Bayesian estimator and the likelihood of seeing the data we do given that the human mind is an optimal Bayesian estimator. The denominator is the total evidence that the human mind is an optimal Bayesian estimator. \cite{Bowers2012BayesianJS} argue that the two terms in the numerator are overestimated and that the denominator is underestimated. In their view, the prior probability that the human mind is optimal is low because of the conflicting results from studies on the optimality of the mind. The likelihood is overestimated because, \cite{Bowers2012BayesianJS} claim, Bayesian methodologies are flexible in fitting the data. The total evidence is underestimated because researchers often do not consider enough non-Bayesian methods that can explain human behavior. 
+
+Responding to the general criticism from \cite{Bowers2012BayesianJS}, \cite{griffiths2012bayesians} clarified that 
+\begin{quote}
+Most Bayesian models of cognition are defined at Marr's (1982) ``computational level,'' characterizing the problem people are solving and its ideal solution. Such models make no direct claim about cognitive processes -- what Marr termed the ``algorithmic level.''
+\end{quote}
+
+However, we notice that there is no clear delineation between algorithmic and computational claims in literature, and often, researchers who set out to make computational claims draw algorithmic conclusion. \cite{Bowers2012BayesianJS} remarked on this fact too, commenting that :
+\begin{quote}
+If neuroscience is to provide any evidence for the theoretical Bayesian perspective, the key question is, what nonbehavioral evidence exists that the neurons compute in this way? The answer is none, unless Bayesian computations are characterized so loosely that they are consistent with almost any computational theory.
+\end{quote}
+
+In principle, we agree with the prominent proponents of Bayesian mind \cite{griffiths2012bayesians} when they state 
+\begin{quote}
+.. a computational level analysis plays a role in explaining cognition similar to that played by a mathematical theory of aerodynamics in explaining bird flight. The theory of aerodynamics says nothing about the anatomical mechanisms of bone and muscle that support flight other than that they must provide a solution with particular properties.
+\end{quote}
+
+In other words, any computational model we can come up with says nothing about the actual algorithmic model implemented by our brain. Referring back to the Bayes formulation given by \cite{Bowers2012BayesianJS}, our study targets the denominator term of total evidence, where we would be attempting to show that there are multiple non-Bayesian methods that explain mind's optimal behaviour. The degraded Brier smoothening algorithm is just a starting point that makes use of a computationally simple algorithm which reasonably resembles subject's behavior. We would like to broaden the debate by questioning the claim that the mind makes use of statistical models in the first place. Such a study will also enable us to compare various methods from the forecasting literature on this dataset, and thus gather additional insights for probabilistic forecasting.
+
+Finally, \cite{griffiths2012bayesians} make an argument about the explanatory power of Bayesian models, arguing that :
+\begin{quote}
+The teleological explanations yielded by Bayesian models of cognition are valuable not just because they satisfy our desire to answer why questions, but because they provide the foundation for universal laws of cognition -- principles that we expect to hold true for intelligent organisms of any kind, anywhere in the universe.
+\end{quote}
+
+Such a quest for universal laws has gained more recent traction with ideas such as \textit{free energy principle} by \cite{friston2006free}. On the other hand, \cite{ramachandran1990interactions} suggested that
+\begin{quote}
+Nature is inherently opportunistic and will often adopt some curious -- even bizarre -- solutions to its problems, especially when it has to make use of preexisting hardware.
+\end{quote}
+
+Despite the attraction of Universal models that explain forecasting abilities, it may be that the mind, successfully at the times and unsuccessfully at others, is just trying to beat reality by making forecasts without using statistical models.
+
+\section{Further areas of research}
+\label{further}
+Our implementation of the degraded Brier smoothing algorithm is only a starting point in this study. The next step would be to improve the Brier score of this algorithm. A surprising fact is that the subjects do better than the degraded Brier smoothing algorithm. The data from experiments conducted by \cite{gallistel2014perception} would prove useful for comparing different forecasting methods in terms of minimizing a proper scoring rule. A few methods that can be considered are from \cite{defesive}, \cite{FREUND200373}, \cite{weissman2001universal}, \cite{vovk2005good}, \cite{rakhlin2015sequential} and use of static experts (\cite{cesa1997use}). There could be potentially many computational models that explain human behavior in a non-stationary Bernoulli process.
+
+\section{Acknowledgements}
+I would like to thank Prof. Glenn Shafer for his invaluable guidance and advice for this study. I would also like to thank Prof. C.R. Gallistel for providing the data and programs from his experiment, and clarifying some of the queries we had on the data-set. Finally, I would like to thank Prof. Robin Gong and Prof. Harry Crane for their helpful suggestions.
+
+\bibliography{References}
+\bibliographystyle{apalike}
+
+\newpage
+\appendix
+\section{\\Notations}
+This section describes the notations used in our algorithm. Some of the notations are the same as in the description of the algorithm in ``The perception of probability'. Notations that are different have been explicitly indicated.
+\begin{itemize}
+\item D - the complete sequence of observed data for a particular subject in a single session. This is an array of 0 or 1 values with size 1000. 1 indicates a green ball and 0 indicates a red ball.
+
+\item CP - Indicates the latest changepoint. A changepoint is a numerical value that indicates the index in D where the algorithm predicts there was a change in the hidden probability. The penultimate changepoint is referred to as CP - 1 and so on.
+
+\item D\textsubscript{$>$CP} - Indicates the sequence of observations after the latest changepoint. In ``The perception of probability'', this is indicated by D\textsubscript{$>$n}. Stored as a sequence (of variable length) of 0s and 1s.
+
+\item D\textsubscript{$>$CP-1} - Indicates the sequence of observations after the penultimate changepoint. In ``The perception of probability'', this is indicated by D\textsubscript{$>$n - 1}. Stored as a sequence (of variable length) of 0s and 1s.
+
+\item p\textsubscript{g} - The hidden true probability of observing a green ball in the next trial, which is the proportion of green balls in the urn. The value of p\textsubscript{g} remains unknown, and could be different for each trial
+
+\item \^{p\textsubscript{g}} - The algorithm's estimate of the true probability of observing a green ball in the next trial.  The value of \^{p\textsubscript{g}} can be different for each trial
+
+\item p\textsubscript{c} - The hidden probability of a change in p\textsubscript{g}. In the ``The perception of probability'', this value is fixed at 0.05. The probability that the true proportion of green balls in the urn changes in a given trial follows a geometric distribution with mean 0.05. 
+
+\item \^{p\textsubscript{c}} - The algorithm's estimate of the probability of a change in p\textsubscript{g}. Unlike the hidden value of p\textsubscript{c} which remains fixed, the changepoint algorithm starts with a  prior value on p\textsubscript{c} and updates this value whenever it detects a change or ``takes back'' a previously determined change.
+
+\item p\textsubscript{o} - The observed probability of green balls in a given sequence of trials. 
+
+\item n\textsubscript{g} - The number of green balls observed in a given sequence of trials.
+
+\item n - The total number of balls observed in a given sequence of trials. In other words, this is the total number of trials in a given sequence.
+
+\item KLCrit - The critical threshold for decision criteria 1. This is referred to in the ``The perception of probability'' as T\textsubscript{1}. KLCrit is a hyper-parameter which is used to decide if the difference between our estimate \^{p\textsubscript{g}} and the observed probability p\textsubscript{o} using the current sequence of observations D\textsubscript{$>$CP} is high enough to warrant further investigation. One possible value is 0.23. This is the first of 4 inputs to the program.
+
+\item BFCrit - The critical threshold for decision criteria 2. This is referred to in the ``The perception of probability'' as T\textsubscript{2}. BFCrit is the threshold to which the Bayes Factor between two models -- a model where there has been 1 change in true probability ($M_1$), and a model in which there has been no changes in the true probability ($M_0$) -- are compared. One possible value for BFCrit is 1. This is the second of 4 inputs to the program.
+
+\item N - The total number of trials the given subject has seen at a given point of time, across all sessions. In ``The perception of probability'', there is no consistent notation for this value.
+
+\item N\textsubscript{c} - The total number of change points observed across all sessions for the given subject. In ``The perception of probability'', this is referred to as n\textsubscript{c}.
+ 
+\item $\alpha_P$ , $\beta_P$ - The initial hyper parameters for the beta distribution on the prior probability for p\textsubscript{g}. The paper recommends using the Bayes-Laplace prior of 1 and 1. The vector of $\alpha_p$ and $\beta_p$ is the third of 4 parameters to the program, and the value remains unchanged.
+
+\item $\alpha_C$ , $\beta_C$ - The hyper parameters for  the beta distribution on the prior probability for p\textsubscript{c}. The paper recommends using the Jeffreys prior of 0.5 and 0.5. The vector of $\alpha_c$ and $\beta_c$ is the fourth of 4 inputs for the program.
+
+\item $\alpha_p$ , $\beta_p$ - The evolving hyper-parameters for the beta distribution on the prior probability of p\textsubscript{g}.     These prior values start with the initial user input for the program, but evolves after each changepoint. 
+
+\item $\alpha_c$ , $\beta_c$ - The evolving hyper-parameters for the beta distribution on the prior probability of p\textsubscript{c}.     These prior values start with the initial user input for the program, but evolves after each changepoint. 
+ 
+\end{itemize}
+
+\section{\\Changepoint Detection Algorithm}
+\begin{enumerate}
+\item Set N = 0, N\textsubscript{g} =  $\alpha_C$
+
+\item Set D\textsubscript{$>$CP-1} and D\textsubscript{$>$CP} as empty sequences
+
+\item Set $\alpha_p$ = $\alpha_P$, $\beta_p$ =  $\beta_P$, $\alpha_c$ = $\alpha_C$ and $\beta_c$ =  $\beta_C$
+
+\item Calculate \[ \hat{p\textsubscript{g}} = \frac{\alpha_g}{\alpha_g + \beta_g} \] and \[ \hat{p\textsubscript{c}} = \frac{\alpha_c}{\alpha_c + \beta_c} \]
+
+\item Make a copy of $\alpha_p$ and $\beta_p$. When $\alpha_p$ and $\beta_p$ change, the copies will be updated with the penultimate values. This will be required in case we decide to remove the latest changepoint.
+
+\item Initiate a Boolean variable detectedChange with FALSE. When we detect a change and update $\hat{p_g}$, we use this boolean flag to ignore the next trial for calculation. This is because our estimates are always for the next trial but they are based on the current trial. If we already have a new estimate for the next trial, we need not recalculate it for the next observation
+
+\item Repeat the following for each trial in the given session.
+
+\item Append the current observation (0 if red, 1 if green) to  D\textsubscript{$>$CP}.
+
+\item Increment n\textsubscript{g} with the value of observation. Increment n with 1
+
+\item Calculate 
+\[ p\textsubscript{o} = \frac{n_g}{n} \]
+
+\item Calculate the Kullback-Leibler divergence using the equation
+\[ KL = p_olog\frac{p_o}{\hat{p_g}} + (1 - p_o)log\frac{1 - p_o}{1 - \hat{p_g}} \]
+
+\item Calculate the evidence of a change, E, using the equation
+\[ E = n * KL \],
+where n = $|D\textsubscript{$>$CP}|$ is the length of the sequence in  D\textsubscript{$>$CP}. 
+
+\item Test the decision criteria for the first stage using the comparison
+\[ E > KLCrit \] and detectedChange is FALSE
+
+At this point, the changepoint algorithm is trying to decide if the difference between our estimate of probability of seeing a green ball in the next trail and the actual proportion of green balls observed in the current trail is big enough to warrant further investigation. If the difference is less than the threshold, the algorithm is satisfied with the current estimate of probability of seeing a green ball, and continues to the next trail. If there was a change in estimate at the end of the previous trial, once again we need not change the estimate yet. In this case, proceed to step 4. If not, proceed to step 33 \par
+
+If the difference is higher than the threshold, we investigate further. There could be 3 possibilities in this case. Briefly, here is how we proceed in each of the 3 cases. These are described in more detail as part of the algorithm.
+	\begin{enumerate}
+	\item There was a change in the true proportion of the green ball, p\textsubscript{g}, since the last identified changepoint CP. In this case, we need to estimate a new changepoint in the sequence D\textsubscript{$>$CP}.
+	\item Our estimate \^{p\textsubscript{g}} at the previous changepoint was incorrect, but we are convinced there was a change. In other words, a change in true probability did occur, but we mis-estimated the extent of the change, and possibly the trial where the change occurred. This could happen if the previous estimate was made after seeing very few observations. To test this case, we temporarily remove CP and append D\textsubscript{$>$CP} with D\textsubscript{$>$CP-1}. We then try to see if adding a new changepoint to the merged sequence of observations can explain the mis-estimate. If we find such a point, we make it the new change point, and recalculate \^{p\textsubscript{g}}. 
+	\item Our estimation of the previous changepoint itself was incorrect. In this case, we eliminate the latest changepoint and proceed with the penultimate changepoint. If the step (b) above does not yield a changepoint, we conclude that the changepoint that we removed temporarily can be ignored permanently.
+	\end{enumerate}
+
+\item Update the priors for \^{p\textsubscript{c}} as
+\[ \alpha_c = \alpha_C + N_c\]
+\[ \beta_c = \beta_C + N - N_c\]
+
+\item Recalculate \^{p\textsubscript{c}} using
+\[ \hat{p\textsubscript{c}} = \frac{\alpha_c}{\alpha_c + \beta_c} \]
+
+\item Call the ``Change-point detection algorithm'' sub-routine with the parameters :
+	\begin{enumerate}
+		\item The priors for the current estimate of \^{p\textsubscript{g}}, $\alpha_p$ and $\beta_p$
+		\item The sequence of observations D\textsubscript{$>$CP}
+		\item The current estimated  of \^{p\textsubscript{c}}
+	\end{enumerate}
+
+\item Compare the posterior odds returned by the subroutine to BFCrit. 
+
+\item If \[ Posterior Odds > BFCrit \], we proceed with the next step. This is case (a) described above. If not, go to step (24)
+
+\item Increment N\textsubscript{c} with 1.
+
+\item Update the copies of priors $\alpha_p$ and $\beta_p$ with the current value of the priors.
+
+\item Update $\alpha_p$ and $\beta_p$ with the values returned from the subroutine
+
+\item The new estimate of \^{p\textsubscript{g}} becomes \[ \hat{p\textsubscript{g}} = \frac{\alpha_g}{\alpha_g + \beta_g} \]
+
+\item Use the index of the changepoint returned by the subroutine to split the observed sequence into two parts. Replace D\textsubscript{$>$CP - 1} with the first part and D\textsubscript{$>$CP} with the second part.
+
+\item Mark detectedChange as TRUE
+
+\item If there are no likely change points in the current sequence of observations, we need to verify cases (2) and (3). However, we need a penultimate sequence for this. Hence, check for the following condition
+\[ Posterior Odds \leq BFCrit  \] and the number of changepoints in the current session is greater than 1. If so, proceed with the next step. If not, proceed to step ()
+
+\item Call the ``Change-point detection algorithm'' sub-routine with the parameters :
+	\begin{enumerate}
+		\item The initial, fixed priors for the current estimate of \^{p\textsubscript{G}}, $\alpha_G$ and $\beta_G$
+		\item The combined sequence of observations  D\textsubscript{$>$CP - 1} and D\textsubscript{$>$CP}
+		\item The current estimated  of \^{p\textsubscript{c}}
+	\end{enumerate}
+
+\item Compare the posterior odds returned by the subroutine to BFCrit. 
+
+\item If \[ Posterior Odds > BFCrit \], we proceed with the next step. This is case (b) described above. If not, go to step (34)
+
+\item Update the copies of priors $\alpha_p$ and $\beta_p$ with the current value of the priors.
+
+\item Update $\alpha_p$ and $\beta_p$ with the values returned from the subroutine
+
+\item The new estimate of \^{p\textsubscript{g}} becomes \[ \hat{p\textsubscript{g}} = \frac{\alpha_g}{\alpha_g + \beta_g} \]
+
+\item Use the index of the changepoint returned by the subroutine to split the combined sequence into two parts. Replace D\textsubscript{$>$CP - 1} with the first part and D\textsubscript{$>$CP} with the second part.
+
+\item Mark detectedChange as TRUE
+
+\item is (28) is false, proceed to next step. If not, continue from (). This is case (c) described above
+
+\item Decrement N\textsubscript{c} with 1.
+
+\item  Update the priors for \^{p\textsubscript{c}} as
+\[ \alpha_c = \alpha_C + N_c\]
+
+\item Recalculate \^{p\textsubscript{c}} using
+\[ \hat{p\textsubscript{c}} = \frac{\alpha_c}{\alpha_c + \beta_c} \]
+
+\item Empty D\textsubscript{$>$CP - 1}. Set D\textsubscript{$>$CP} as the combined sequence	
+
+\item Mark detectedChange as TRUE
+
+\item Update $\alpha_p$ and $\beta_p$ with the copies from the previous trial.
+
+\item The new estimate of \^{p\textsubscript{g}} becomes \[ \hat{p\textsubscript{g}} = \frac{\alpha_g}{\alpha_g + \beta_g} \]
+
+\item If 25 is false, there has been no change points detected until this point. Proceed with the following steps
+
+\item Set 
+\[ \alpha_p = \alpha_P + Number_greens_in_D\textsubscript{$>$CP}\] and
+\[ \beta_p = \beta_P + Number_reds_in_D\textsubscript{$>$CP}\]
+
+\item The new estimate of \^{p\textsubscript{g}} becomes \[ \hat{p\textsubscript{g}} = \frac{\alpha_g}{\alpha_g + \beta_g} \]
+
+\item If (13) is false, set detectedChange as FALSE
+
+\item Proceed to next observation.
+\end{enumerate}
+
+
+
+\end{document}

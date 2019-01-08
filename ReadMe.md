@@ -5,6 +5,6 @@ This work is a part of the Capstone project for my graduate degree. We use the d
 We start by replicating Gallistel et. al.'s modified changepoint algorithm, which we call the GKLML model.
 We then use alternate models from the forecasting literature that do not require any statistical models.
 The following models have have been implemented as a part of this repositary
-- ##The GKLML model
+## -The GKLML model
 
-- ##The degraded Brier smoothening algorithm
+## -The degraded Brier smoothening algorithm

@@ -289,6 +289,18 @@ Despite the attraction of Universal models that explain forecasting abilities, i
 \label{further}
 Our implementation of the degraded Brier smoothing algorithm is only a starting point in this study. The next step would be to improve the Brier score of this algorithm. A surprising fact is that the subjects do better than the degraded Brier smoothing algorithm. The data from experiments conducted by \cite{gallistel2014perception} would prove useful for comparing different forecasting methods in terms of minimizing a proper scoring rule. A few methods that can be considered are from \cite{defesive}, \cite{FREUND200373}, \cite{weissman2001universal}, \cite{vovk2005good}, \cite{rakhlin2015sequential} and use of static experts (\cite{cesa1997use}). There could be potentially many computational models that explain human behavior in a non-stationary Bernoulli process.
 
+More specifically, here are some of the areas that a research project can focus on :
+\begin{itemize}
+\item As of now, we have attempted fitting our models only to a single subject's single session. The first step would be to extend the model for all the subject's and sessions and compare the overall results.
+\item Apply defensive forecasting to minimize score.
+\item Use deep learning. For this, further research is needed on use of deep learning methods for online scenarios.
+\item Use other scoring rules such as logarithmic score and spherical score to compare results.
+\item Attempt to fit the model for cyclical predictions described in \cite{gallistel2014perception}.
+\end{itemize}
+
+\section{Supplementary materials}
+The program scripts and the data files used in this work are available in GitHub - the online source code repository. The python program files used are available in the public repositary at https://github.com/adarshvee/CognitiveStatisticalModels. These can be downloaded directly by clicking "Clone or download" button on top-right of the page. The data files used and a few other supplementary information are available in a private GitHub repository. To access the private repository, please create a free account at the website https://github.com/ (if you already do not have an account), and email adarsh.vijayaraghavan@rutgers.edu with the account details. 
+
 \section{Acknowledgements}
 I would like to thank Prof. Glenn Shafer for his invaluable guidance and advice for this study. I would also like to thank Prof. C.R. Gallistel for providing the data and programs from his experiment, and clarifying some of the queries we had on the data-set. Finally, I would like to thank Prof. Robin Gong and Prof. Harry Crane for their helpful suggestions.
 
